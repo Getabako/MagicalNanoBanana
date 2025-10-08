@@ -493,6 +493,17 @@
         <h1>🍌 マジカルナノバナナ∞</h1>
         <p class="subtitle">プロンプトを1行に1つずつ入力して、一括で画像・動画を生成できます</p>
 
+        <!-- Authentication Section -->
+        <div id="authSection" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 2000; display: flex; align-items: center; justify-content: center;">
+            <div style="background: linear-gradient(to bottom, #FFFBEB 0%, #FFF9E6 100%); border-radius: 20px; padding: 40px; border: 3px solid #FFD93D; max-width: 400px; width: 90%;">
+                <h2 style="color: #FF6B35; margin-bottom: 20px; text-align: center;">🔒 認証が必要です</h2>
+                <p style="color: #8B4513; margin-bottom: 20px; text-align: center;">パスワードを入力してください</p>
+                <input type="password" id="authPassword" placeholder="パスワード" style="width: 100%; padding: 15px; border: 2px solid #FFD93D; border-radius: 8px; font-size: 16px; margin-bottom: 15px;">
+                <button id="authSubmit" style="width: 100%; padding: 15px; background: linear-gradient(135deg, #FFD93D 0%, #FFA500 100%); color: #8B4513; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 700;">ログイン</button>
+                <div id="authError" style="color: #DC3545; margin-top: 15px; text-align: center; display: none; font-weight: 600;"></div>
+            </div>
+        </div>
+
         <!-- Tab Navigation -->
         <div class="tab-navigation">
             <button class="tab-button active" data-tab="image-tab">画像生成</button>
@@ -505,6 +516,62 @@
         <!-- Consistency Settings Section -->
         <div class="input-section">
             <label>一貫性設定（キャラクター・背景を統一）：</label>
+
+            <!-- Accordion for Instruction Text -->
+            <details style="margin-bottom: 15px; border: 2px solid #FFD93D; border-radius: 8px; padding: 15px; background: #FFFBF0;">
+                <summary style="cursor: pointer; font-weight: 600; color: #8B4513; font-size: 15px;">📋 一貫性設定作成用の指示文（コピペ用）</summary>
+                <div style="margin-top: 15px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #FFD93D;">
+                    <p style="font-size: 14px; color: #8B4513; margin-bottom: 10px;">以下の画像を詳細に分析し、一貫性設定を作成してください。</p>
+
+                    <h4 style="color: #FF6B35; margin-top: 15px; margin-bottom: 8px; font-size: 14px;">【分析項目】</h4>
+                    <ol style="font-size: 13px; color: #555; line-height: 1.8; margin-left: 20px;">
+                        <li>場所・環境（建物、部屋の特徴、家具、小道具、色調など）</li>
+                        <li>登場人物（年齢、性別、人数、髪型、服装、特徴的な要素）</li>
+                        <li>時間帯・照明（自然光/人工光、時間帯、影の雰囲気）</li>
+                        <li>全体の雰囲気・スタイル（写実的/イラスト風、明るさ、感情）</li>
+                        <li>カメラワーク・構図（アングル、被写界深度、色調）</li>
+                    </ol>
+
+                    <h4 style="color: #FF6B35; margin-top: 15px; margin-bottom: 8px; font-size: 14px;">【出力形式】</h4>
+                    <p style="font-size: 13px; color: #555; margin-bottom: 10px;">以下の5項目を英語で詳細に記述し、コピペですぐに使える形式で出力してください：</p>
+
+                    <pre style="background: #f5f5f5; padding: 12px; border-radius: 6px; font-size: 12px; color: #333; overflow-x: auto; border: 1px solid #ddd;">**【設定名】**
+[日本語で簡潔に]
+
+**【場所・環境】**
+[英語で詳細に記述]
+
+**【キャラクター・人物】**
+[英語で詳細に記述、年齢・性別・髪型・服装・特徴など]
+
+**【時間帯・照明】**
+[英語で詳細に記述]
+
+**【雰囲気・スタイル】**
+[英語で詳細に記述]
+
+**【追加の詳細設定】**
+[カメラアングル、小道具、色調、構図など英語で記述]</pre>
+
+                    <h4 style="color: #FF6B35; margin-top: 15px; margin-bottom: 8px; font-size: 14px;">注意：</h4>
+                    <ul style="font-size: 13px; color: #555; line-height: 1.8; margin-left: 20px;">
+                        <li>できる限り具体的かつ詳細に記述</li>
+                        <li>一貫性を保つため、繰り返し登場する要素（人物の特徴、場所の特徴）を正確に</li>
+                        <li>英語での記述により、AIの画像生成精度を向上</li>
+                    </ul>
+
+                    <hr style="margin: 20px 0; border: none; border-top: 1px dashed #FFD93D;">
+
+                    <h4 style="color: #FF6B35; margin-bottom: 8px; font-size: 14px;">使用例</h4>
+                    <p style="font-size: 13px; color: #555;">今後、新しい投稿シリーズの画像を共有する際は：</p>
+                    <ol style="font-size: 13px; color: #555; line-height: 1.8; margin-left: 20px;">
+                        <li>画像を添付</li>
+                        <li>上記の指示文をコピペ</li>
+                        <li>送信</li>
+                    </ol>
+                </div>
+            </details>
+
             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
                 <button id="showPresetBtn" style="flex: 1; padding: 10px; background: linear-gradient(135deg, #90EE90 0%, #32CD32 100%); color: #155724; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">設定を登録・編集</button>
                 <button id="clearPresetBtn" style="flex: 1; padding: 10px; background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">設定をクリア</button>
@@ -617,7 +684,14 @@
     </div>
 
     <script>
-        // API Configuration
+        // Authentication Configuration
+        const AUTH_PASSWORD = 'IFjuku19841121';
+        let isAuthenticated = false;
+
+        // Google Apps Script Web App URL (ここにデプロイしたURLを設定)
+        const NOTIFICATION_URL = 'https://script.google.com/macros/s/AKfycbyaiJyrufDqxDIEdkYnUYQNCs-MHDOp_WhJNsTRN43cnYQHxhI0mLhsOdCwSaQ-4stc/exec';
+
+        // API Configuration (認証後のみ使用可能)
         const GEMINI_API_KEY = 'AIzaSyCB484iyfZOA79svA7rJ7QNB-P5HJmt-Tw';
         const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent';
         const PIXVERSE_API_KEY = 'sk-45f4fa9bc0726d82cf4863e526478f32';
@@ -836,6 +910,102 @@
 
         // Initialize preset status
         updatePresetStatus();
+
+        // Authentication Elements
+        const authSection = document.getElementById('authSection');
+        const authPassword = document.getElementById('authPassword');
+        const authSubmit = document.getElementById('authSubmit');
+        const authError = document.getElementById('authError');
+
+        // Check authentication on page load
+        function checkAuth() {
+            const savedAuth = sessionStorage.getItem('nanobanana_auth');
+            if (savedAuth === 'true') {
+                isAuthenticated = true;
+                authSection.style.display = 'none';
+            } else {
+                isAuthenticated = false;
+                authSection.style.display = 'flex';
+            }
+        }
+
+        // Send notification email
+        async function sendLoginNotification() {
+            if (!NOTIFICATION_URL || NOTIFICATION_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+                console.log('Notification URL not configured');
+                return;
+            }
+
+            try {
+                // Get user's IP and browser info
+                const userAgent = navigator.userAgent;
+
+                // IPアドレス取得（外部API使用）
+                let ipAddress = '不明';
+                try {
+                    const ipResponse = await fetch('https://api.ipify.org?format=json');
+                    const ipData = await ipResponse.json();
+                    ipAddress = ipData.ip;
+                } catch (e) {
+                    console.log('IP取得失敗:', e);
+                }
+
+                // Google Apps Scriptに通知送信
+                await fetch(NOTIFICATION_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        ip: ipAddress,
+                        userAgent: userAgent
+                    })
+                });
+
+                console.log('Login notification sent');
+            } catch (error) {
+                console.error('Failed to send notification:', error);
+            }
+        }
+
+        // Authentication submit
+        authSubmit.addEventListener('click', async () => {
+            const password = authPassword.value;
+            if (password === AUTH_PASSWORD) {
+                isAuthenticated = true;
+                sessionStorage.setItem('nanobanana_auth', 'true');
+                authSection.style.display = 'none';
+                authError.style.display = 'none';
+
+                // メール通知を送信
+                sendLoginNotification();
+            } else {
+                authError.textContent = '❌ パスワードが間違っています';
+                authError.style.display = 'block';
+                authPassword.value = '';
+            }
+        });
+
+        // Allow Enter key to submit
+        authPassword.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                authSubmit.click();
+            }
+        });
+
+        // Check auth before any API call
+        function requireAuth() {
+            if (!isAuthenticated) {
+                alert('認証が必要です');
+                authSection.style.display = 'flex';
+                return false;
+            }
+            return true;
+        }
+
+        // Initialize authentication
+        checkAuth();
 
         function showStatus(message, type = 'info') {
             statusDiv.textContent = message;
@@ -1240,6 +1410,8 @@
         }
 
         generateBtn.addEventListener('click', async () => {
+            if (!requireAuth()) return;
+
             const promptsText = promptsTextarea.value.trim();
             if (!promptsText) {
                 showStatus('プロンプトを入力してください', 'error');
@@ -1367,6 +1539,8 @@
 
         // Video Generation Event Listeners
         generateVideoBtn.addEventListener('click', async () => {
+            if (!requireAuth()) return;
+
             if (uploadedVideoImages.length === 0) {
                 showVideoStatus('画像をアップロードしてください', 'error');
                 return;
