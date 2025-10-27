@@ -367,6 +367,22 @@
             display: block;
         }
 
+        #stopVideoBtn, #stopI2IBtn {
+            background: linear-gradient(135deg, #FF6B6B 0%, #EE5A6F 100%);
+            color: white;
+            display: none;
+            font-weight: 700;
+        }
+
+        #stopVideoBtn:hover:not(:disabled), #stopI2IBtn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(238, 90, 111, 0.5);
+        }
+
+        #stopVideoBtn.active, #stopI2IBtn.active {
+            display: block;
+        }
+
         /* Tab Navigation Styles */
         .tab-navigation {
             display: flex;
@@ -507,6 +523,7 @@
         <!-- Tab Navigation -->
         <div class="tab-navigation">
             <button class="tab-button active" data-tab="image-tab">画像生成</button>
+            <button class="tab-button" data-tab="image2image-tab">画像編集</button>
             <button class="tab-button" data-tab="video-tab">動画生成</button>
         </div>
 
@@ -648,6 +665,40 @@
         <div id="gallery" class="gallery"></div>
         </div>
 
+        <!-- Image to Image Tab -->
+        <div id="image2image-tab" class="tab-content">
+            <div class="input-section">
+                <label>編集する画像をアップロード（番号順に並べてください）：</label>
+                <div id="i2iDropZone" class="drop-zone">
+                    <div class="drop-zone-icon">📁</div>
+                    <div class="drop-zone-text">画像をドラッグ＆ドロップ または クリックして選択</div>
+                    <input type="file" id="i2iFileInput" multiple accept="image/*" style="display:none;">
+                </div>
+                <div id="i2iUploadedImages" class="uploaded-images" style="display:none;"></div>
+            </div>
+
+            <div class="input-section">
+                <label for="i2iPrompts">編集プロンプト（1行に1つずつ、アップロードした画像の順番に対応）：</label>
+                <textarea id="i2iPrompts" placeholder="例：&#10;背景を青空に変更&#10;夜のシーンに変更&#10;笑顔を追加"></textarea>
+            </div>
+
+            <div class="button-group">
+                <button id="generateI2IBtn">画像を編集</button>
+                <button id="stopI2IBtn">編集を停止</button>
+                <button id="downloadI2IBtn" disabled>ZIPでダウンロード</button>
+            </div>
+
+            <div id="i2iStatus" class="status"></div>
+
+            <div class="progress">
+                <div id="i2iProgressBar" class="progress-bar">
+                    <div id="i2iProgressFill" class="progress-fill">0%</div>
+                </div>
+            </div>
+
+            <div id="i2iGallery" class="gallery"></div>
+        </div>
+
         <!-- Video Generation Tab -->
         <div id="video-tab" class="tab-content">
             <div class="input-section">
@@ -707,6 +758,10 @@
         let generatedVideos = [];
         let isGeneratingVideo = false;
         let shouldStopVideo = false;
+        let uploadedI2IImages = [];
+        let editedImages = [];
+        let isEditingI2I = false;
+        let shouldStopI2I = false;
         let currentPreset = null;
 
         // Image Generation Elements
@@ -740,6 +795,19 @@
         const videoProgressBar = document.getElementById('videoProgressBar');
         const videoProgressFill = document.getElementById('videoProgressFill');
         const videoGallery = document.getElementById('videoGallery');
+
+        // Image to Image Elements
+        const i2iDropZone = document.getElementById('i2iDropZone');
+        const i2iFileInput = document.getElementById('i2iFileInput');
+        const i2iUploadedImagesDiv = document.getElementById('i2iUploadedImages');
+        const i2iPromptsTextarea = document.getElementById('i2iPrompts');
+        const generateI2IBtn = document.getElementById('generateI2IBtn');
+        const stopI2IBtn = document.getElementById('stopI2IBtn');
+        const downloadI2IBtn = document.getElementById('downloadI2IBtn');
+        const i2iStatusDiv = document.getElementById('i2iStatus');
+        const i2iProgressBar = document.getElementById('i2iProgressBar');
+        const i2iProgressFill = document.getElementById('i2iProgressFill');
+        const i2iGallery = document.getElementById('i2iGallery');
 
         // Tab Management
         document.querySelectorAll('.tab-button').forEach(button => {
@@ -1017,6 +1085,11 @@
             videoStatusDiv.className = `status ${type}`;
         }
 
+        function showI2IStatus(message, type = 'info') {
+            i2iStatusDiv.textContent = message;
+            i2iStatusDiv.className = `status ${type}`;
+        }
+
         function generateUUID() {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
                 const r = Math.random() * 16 | 0;
@@ -1037,7 +1110,13 @@
             videoProgressFill.textContent = `${percentage}% (${current}/${total})`;
         }
 
-        // Drag & Drop Functionality
+        function updateI2IProgress(current, total) {
+            const percentage = Math.round((current / total) * 100);
+            i2iProgressFill.style.width = `${percentage}%`;
+            i2iProgressFill.textContent = `${percentage}% (${current}/${total})`;
+        }
+
+        // Drag & Drop Functionality for Video
         dropZone.addEventListener('click', () => fileInput.click());
 
         dropZone.addEventListener('dragover', (e) => {
@@ -1095,6 +1174,69 @@
                     imageItem.appendChild(img);
                     imageItem.appendChild(filename);
                     uploadedImagesDiv.appendChild(imageItem);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Drag & Drop Functionality for Image to Image
+        i2iDropZone.addEventListener('click', () => i2iFileInput.click());
+
+        i2iDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            i2iDropZone.classList.add('dragover');
+        });
+
+        i2iDropZone.addEventListener('dragleave', () => {
+            i2iDropZone.classList.remove('dragover');
+        });
+
+        i2iDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            i2iDropZone.classList.remove('dragover');
+            handleI2IFiles(e.dataTransfer.files);
+        });
+
+        i2iFileInput.addEventListener('change', (e) => {
+            handleI2IFiles(e.target.files);
+        });
+
+        function handleI2IFiles(files) {
+            const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
+
+            // Sort files by name (numeric order)
+            imageFiles.sort((a, b) => {
+                const numA = parseInt(a.name.match(/\d+/)?.[0] || 0);
+                const numB = parseInt(b.name.match(/\d+/)?.[0] || 0);
+                return numA - numB;
+            });
+
+            uploadedI2IImages = [];
+            i2iUploadedImagesDiv.innerHTML = '';
+            i2iUploadedImagesDiv.style.display = 'grid';
+
+            imageFiles.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    uploadedI2IImages.push({
+                        file: file,
+                        dataUrl: e.target.result,
+                        filename: file.name
+                    });
+
+                    const imageItem = document.createElement('div');
+                    imageItem.className = 'uploaded-image-item';
+
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+
+                    const filename = document.createElement('div');
+                    filename.className = 'filename';
+                    filename.textContent = file.name;
+
+                    imageItem.appendChild(img);
+                    imageItem.appendChild(filename);
+                    i2iUploadedImagesDiv.appendChild(imageItem);
                 };
                 reader.readAsDataURL(file);
             });
@@ -1742,6 +1884,210 @@
                 showVideoStatus('ZIPファイルの作成に失敗しました', 'error');
             } finally {
                 downloadVideoBtn.disabled = false;
+            }
+        });
+
+        // Image to Image Event Listeners
+        function addI2IToGallery(imageUrl, prompt, filename, originalUrl, index) {
+            const imageItem = document.createElement('div');
+            imageItem.className = 'image-item';
+            imageItem.dataset.index = index;
+
+            const img = document.createElement('img');
+            img.src = imageUrl;
+
+            const promptDiv = document.createElement('div');
+            promptDiv.className = 'prompt';
+            promptDiv.textContent = `元画像: ${filename} | プロンプト: ${prompt}`;
+
+            const editSection = document.createElement('div');
+            editSection.className = 'edit-section';
+
+            const editInput = document.createElement('textarea');
+            editInput.className = 'edit-input';
+            editInput.placeholder = '追加の修正指示を入力...';
+
+            const editBtn = document.createElement('button');
+            editBtn.className = 'edit-btn';
+            editBtn.textContent = '再編集';
+            editBtn.onclick = async () => {
+                const instruction = editInput.value.trim();
+                if (!instruction) {
+                    alert('修正指示を入力してください');
+                    return;
+                }
+
+                editBtn.disabled = true;
+                editBtn.textContent = '編集中...';
+
+                try {
+                    // Re-edit the current image with new instruction
+                    const newImageUrl = await generateImage(instruction, imageUrl);
+                    const newBlob = await dataUrlToBlob(newImageUrl);
+
+                    // Update image in array
+                    editedImages[index].url = newImageUrl;
+                    editedImages[index].blob = newBlob;
+
+                    // Update displayed image
+                    img.src = newImageUrl;
+                    editInput.value = '';
+
+                    editBtn.textContent = '編集完了!';
+                    setTimeout(() => {
+                        editBtn.textContent = '再編集';
+                        editBtn.disabled = false;
+                    }, 2000);
+                } catch (error) {
+                    console.error('Error re-editing image:', error);
+                    alert('画像の再編集に失敗しました');
+                    editBtn.textContent = '再編集';
+                    editBtn.disabled = false;
+                }
+            };
+
+            editSection.appendChild(editInput);
+            editSection.appendChild(editBtn);
+
+            imageItem.appendChild(img);
+            imageItem.appendChild(promptDiv);
+            imageItem.appendChild(editSection);
+            i2iGallery.appendChild(imageItem);
+        }
+
+        generateI2IBtn.addEventListener('click', async () => {
+            if (!requireAuth()) return;
+
+            if (uploadedI2IImages.length === 0) {
+                showI2IStatus('画像をアップロードしてください', 'error');
+                return;
+            }
+
+            const promptsText = i2iPromptsTextarea.value.trim();
+            if (!promptsText) {
+                showI2IStatus('プロンプトを入力してください', 'error');
+                return;
+            }
+
+            const prompts = promptsText.split('\n').filter(p => p.trim() !== '');
+            if (prompts.length !== uploadedI2IImages.length) {
+                showI2IStatus(`プロンプトの数(${prompts.length})と画像の数(${uploadedI2IImages.length})が一致しません`, 'error');
+                return;
+            }
+
+            // Reset
+            editedImages = [];
+            i2iGallery.innerHTML = '';
+            downloadI2IBtn.disabled = true;
+            generateI2IBtn.disabled = true;
+            stopI2IBtn.classList.add('active');
+            isEditingI2I = true;
+            shouldStopI2I = false;
+            i2iProgressBar.classList.add('active');
+
+            showI2IStatus(`${uploadedI2IImages.length}枚の画像を編集中...`, 'info');
+
+            let successCount = 0;
+            let errorCount = 0;
+
+            for (let i = 0; i < uploadedI2IImages.length; i++) {
+                if (shouldStopI2I) {
+                    showI2IStatus('編集を中止しました', 'error');
+                    break;
+                }
+
+                const imageData = uploadedI2IImages[i];
+                const prompt = prompts[i].trim();
+                updateI2IProgress(i, uploadedI2IImages.length);
+
+                try {
+                    showI2IStatus(`画像 ${i + 1}/${uploadedI2IImages.length} を編集中: ${imageData.filename}`, 'info');
+
+                    // Edit image using Gemini API
+                    const editedImageUrl = await generateImage(prompt, imageData.dataUrl);
+
+                    // Convert to blob for download
+                    const blob = await dataUrlToBlob(editedImageUrl);
+
+                    const imageIndex = editedImages.length;
+                    editedImages.push({
+                        blob: blob,
+                        prompt: prompt,
+                        url: editedImageUrl,
+                        filename: imageData.filename,
+                        originalUrl: imageData.dataUrl
+                    });
+
+                    addI2IToGallery(editedImageUrl, prompt, imageData.filename, imageData.dataUrl, imageIndex);
+                    successCount++;
+
+                    // Wait between requests to avoid rate limits
+                    if (i < uploadedI2IImages.length - 1 && !shouldStopI2I) {
+                        await new Promise(resolve => setTimeout(resolve, 3000)); // 3 second delay
+                    }
+
+                } catch (error) {
+                    console.error(`Error editing image "${imageData.filename}":`, error);
+                    errorCount++;
+                    showI2IStatus(`エラー: ${imageData.filename}`, 'error');
+                }
+            }
+
+            updateI2IProgress(uploadedI2IImages.length, uploadedI2IImages.length);
+            i2iProgressBar.classList.remove('active');
+            generateI2IBtn.disabled = false;
+            stopI2IBtn.classList.remove('active');
+            isEditingI2I = false;
+
+            if (successCount > 0) {
+                downloadI2IBtn.disabled = false;
+                showI2IStatus(`完了: ${successCount}枚編集成功` + (errorCount > 0 ? `, ${errorCount}枚失敗` : ''), 'success');
+            } else {
+                showI2IStatus('画像の編集に失敗しました', 'error');
+            }
+        });
+
+        stopI2IBtn.addEventListener('click', () => {
+            if (isEditingI2I) {
+                shouldStopI2I = true;
+                stopI2IBtn.disabled = true;
+                showI2IStatus('編集を停止しています...', 'info');
+            }
+        });
+
+        downloadI2IBtn.addEventListener('click', async () => {
+            if (editedImages.length === 0) {
+                showI2IStatus('ダウンロードする画像がありません', 'error');
+                return;
+            }
+
+            showI2IStatus('ZIPファイルを作成中...', 'info');
+            downloadI2IBtn.disabled = true;
+
+            try {
+                const zip = new JSZip();
+                const folder = zip.folder('nanobanana_edited_images');
+
+                editedImages.forEach((img, index) => {
+                    const paddedIndex = String(index + 1).padStart(3, '0');
+                    const baseFilename = img.filename.replace(/\.[^.]+$/, '');
+                    const filename = `${paddedIndex}_${baseFilename}_edited.png`;
+                    folder.file(filename, img.blob);
+                });
+
+                const content = await zip.generateAsync({ type: 'blob' });
+
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(content);
+                link.download = `nanobanana_edited_images_${new Date().toISOString().slice(0, 10)}.zip`;
+                link.click();
+
+                showI2IStatus('ZIPファイルのダウンロードが開始されました', 'success');
+            } catch (error) {
+                console.error('Error creating ZIP:', error);
+                showI2IStatus('ZIPファイルの作成に失敗しました', 'error');
+            } finally {
+                downloadI2IBtn.disabled = false;
             }
         });
     </script>
