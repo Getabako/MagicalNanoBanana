@@ -39,6 +39,57 @@
             text-align: center;
             font-weight: 800;
             text-shadow: 2px 2px 4px rgba(255, 215, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .banana-animation {
+            width: 60px;
+            height: 60px;
+            position: relative;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .banana-animation img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            opacity: 0;
+            animation: bananaFlip 1.2s steps(1) infinite;
+        }
+
+        .banana-animation img:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .banana-animation img:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        .banana-animation img:nth-child(3) {
+            animation-delay: 0.6s;
+        }
+
+        .banana-animation img:nth-child(4) {
+            animation-delay: 0.9s;
+        }
+
+        @keyframes bananaFlip {
+            0% {
+                opacity: 1;
+            }
+            25% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 0;
+            }
         }
 
         .subtitle {
@@ -506,7 +557,15 @@
 </head>
 <body>
     <div class="container">
-        <h1>🍌 マジカルナノバナナ∞</h1>
+        <h1>
+            <div class="banana-animation">
+                <img src="images/1.png" alt="Cyber Banana">
+                <img src="images/2.png" alt="Cyber Banana">
+                <img src="images/3.png" alt="Cyber Banana">
+                <img src="images/4.png" alt="Cyber Banana">
+            </div>
+            マジカルナノバナナ∞
+        </h1>
         <p class="subtitle">プロンプトを1行に1つずつ入力して、一括で画像・動画を生成できます</p>
 
         <!-- Authentication Section -->
@@ -534,91 +593,15 @@
         <div class="input-section">
             <label>一貫性設定（キャラクター・背景を統一）：</label>
 
-            <!-- Accordion for Instruction Text -->
-            <details style="margin-bottom: 15px; border: 2px solid #FFD93D; border-radius: 8px; padding: 15px; background: #FFFBF0;">
-                <summary style="cursor: pointer; font-weight: 600; color: #8B4513; font-size: 15px;">📋 一貫性設定作成用の指示文（コピペ用）</summary>
-                <div style="margin-top: 15px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #FFD93D;">
-                    <p style="font-size: 14px; color: #8B4513; margin-bottom: 10px;">以下の画像を詳細に分析し、一貫性設定を作成してください。</p>
-
-                    <h4 style="color: #FF6B35; margin-top: 15px; margin-bottom: 8px; font-size: 14px;">【分析項目】</h4>
-                    <ol style="font-size: 13px; color: #555; line-height: 1.8; margin-left: 20px;">
-                        <li>場所・環境（建物、部屋の特徴、家具、小道具、色調など）</li>
-                        <li>登場人物（年齢、性別、人数、髪型、服装、特徴的な要素）</li>
-                        <li>時間帯・照明（自然光/人工光、時間帯、影の雰囲気）</li>
-                        <li>全体の雰囲気・スタイル（写実的/イラスト風、明るさ、感情）</li>
-                        <li>カメラワーク・構図（アングル、被写界深度、色調）</li>
-                    </ol>
-
-                    <h4 style="color: #FF6B35; margin-top: 15px; margin-bottom: 8px; font-size: 14px;">【出力形式】</h4>
-                    <p style="font-size: 13px; color: #555; margin-bottom: 10px;">以下の5項目を英語で詳細に記述し、コピペですぐに使える形式で出力してください：</p>
-
-                    <pre style="background: #f5f5f5; padding: 12px; border-radius: 6px; font-size: 12px; color: #333; overflow-x: auto; border: 1px solid #ddd;">**【設定名】**
-[日本語で簡潔に]
-
-**【場所・環境】**
-[英語で詳細に記述]
-
-**【キャラクター・人物】**
-[英語で詳細に記述、年齢・性別・髪型・服装・特徴など]
-
-**【時間帯・照明】**
-[英語で詳細に記述]
-
-**【雰囲気・スタイル】**
-[英語で詳細に記述]
-
-**【追加の詳細設定】**
-[カメラアングル、小道具、色調、構図など英語で記述]</pre>
-
-                    <h4 style="color: #FF6B35; margin-top: 15px; margin-bottom: 8px; font-size: 14px;">注意：</h4>
-                    <ul style="font-size: 13px; color: #555; line-height: 1.8; margin-left: 20px;">
-                        <li>できる限り具体的かつ詳細に記述</li>
-                        <li>一貫性を保つため、繰り返し登場する要素（人物の特徴、場所の特徴）を正確に</li>
-                        <li>英語での記述により、AIの画像生成精度を向上</li>
-                    </ul>
-
-                    <hr style="margin: 20px 0; border: none; border-top: 1px dashed #FFD93D;">
-
-                    <h4 style="color: #FF6B35; margin-bottom: 8px; font-size: 14px;">使用例</h4>
-                    <p style="font-size: 13px; color: #555;">今後、新しい投稿シリーズの画像を共有する際は：</p>
-                    <ol style="font-size: 13px; color: #555; line-height: 1.8; margin-left: 20px;">
-                        <li>画像を添付</li>
-                        <li>上記の指示文をコピペ</li>
-                        <li>送信</li>
-                    </ol>
-                </div>
-            </details>
-
-            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                <button id="showPresetBtn" style="flex: 1; padding: 10px; background: linear-gradient(135deg, #90EE90 0%, #32CD32 100%); color: #155724; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">設定を登録・編集</button>
-                <button id="clearPresetBtn" style="flex: 1; padding: 10px; background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">設定をクリア</button>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 8px; color: #8B4513; font-weight: 600; font-size: 14px;">設定を選択：</label>
+                <select id="presetSelector" style="width: 100%; padding: 12px; border: 2px solid #FFD93D; border-radius: 8px; font-size: 15px; background: white; cursor: pointer; font-weight: 500;">
+                    <option value="">選択しない</option>
+                </select>
             </div>
+
             <div id="presetStatus" style="padding: 10px; background: #FFF3CD; border: 2px solid #FFD93D; border-radius: 8px; font-size: 14px; color: #8B4513; display: none;">
                 設定なし
-            </div>
-        </div>
-
-        <!-- Preset Modal -->
-        <div id="presetModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; overflow-y: auto;">
-            <div style="max-width: 800px; margin: 50px auto; background: linear-gradient(to bottom, #FFFBEB 0%, #FFF9E6 100%); border-radius: 20px; padding: 30px; border: 3px solid #FFD93D;">
-                <h2 style="color: #FF6B35; margin-bottom: 10px;">一貫性設定</h2>
-                <p style="color: #8B4513; margin-bottom: 20px; font-size: 14px;">以下のフォーマットで一括貼り付けできます：<br>
-                設定名：xxx<br>場所・環境：xxx<br>キャラクター・人物：xxx<br>時間帯・照明：xxx<br>雰囲気・スタイル：xxx<br>追加の詳細設定：xxx</p>
-
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; margin-bottom: 8px; color: #8B4513; font-weight: 600;">一貫性設定（以下の形式で一括貼り付け可能）：</label>
-                    <textarea id="presetBulkInput" placeholder="設定名：プログラミング教室シーン
-場所・環境：Modern bright programming classroom...
-キャラクター・人物：Japanese male instructor...
-時間帯・照明：Mid-morning to early afternoon...
-雰囲気・スタイル：Photorealistic style...
-追加の詳細設定：Camera angle: eye-level..." style="width: 100%; min-height: 300px; padding: 15px; border: 2px solid #FFD93D; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 13px;"></textarea>
-                </div>
-
-                <div style="display: flex; gap: 15px;">
-                    <button id="savePresetBtn" style="flex: 1; padding: 15px; background: linear-gradient(135deg, #FFD93D 0%, #FFA500 100%); color: #8B4513; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 700;">保存</button>
-                    <button id="closePresetBtn" style="flex: 1; padding: 15px; background: #ccc; color: #666; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 700;">キャンセル</button>
-                </div>
             </div>
         </div>
 
@@ -775,13 +758,9 @@
         const gallery = document.getElementById('gallery');
 
         // Preset Elements
-        const showPresetBtn = document.getElementById('showPresetBtn');
-        const clearPresetBtn = document.getElementById('clearPresetBtn');
+        const presetSelector = document.getElementById('presetSelector');
         const presetStatus = document.getElementById('presetStatus');
-        const presetModal = document.getElementById('presetModal');
-        const savePresetBtn = document.getElementById('savePresetBtn');
-        const closePresetBtn = document.getElementById('closePresetBtn');
-        const presetBulkInput = document.getElementById('presetBulkInput');
+        let availablePresets = [];
 
         // Video Generation Elements
         const dropZone = document.getElementById('dropZone');
@@ -824,7 +803,7 @@
             });
         });
 
-        // Preset Management
+        // CSV Preset Management
         function updatePresetStatus() {
             if (currentPreset) {
                 presetStatus.style.display = 'block';
@@ -839,75 +818,6 @@
                 presetStatus.style.color = '#8B4513';
                 presetStatus.textContent = '設定なし';
             }
-        }
-
-        function loadPresetToForm() {
-            if (currentPreset) {
-                const bulkText = `設定名：${currentPreset.name || ''}
-場所・環境：${currentPreset.location || ''}
-キャラクター・人物：${currentPreset.characters || ''}
-時間帯・照明：${currentPreset.lighting || ''}
-雰囲気・スタイル：${currentPreset.style || ''}
-追加の詳細設定：${currentPreset.additional || ''}`;
-                presetBulkInput.value = bulkText;
-            } else {
-                presetBulkInput.value = '';
-            }
-        }
-
-        function parsePresetFromBulkText(text) {
-            const preset = {
-                name: '',
-                location: '',
-                characters: '',
-                lighting: '',
-                style: '',
-                additional: ''
-            };
-
-            // Parse line by line
-            const lines = text.split('\n');
-            let currentKey = null;
-            let currentValue = [];
-
-            for (const line of lines) {
-                // Check if line starts with a key
-                if (line.startsWith('設定名：') || line.startsWith('設定名:')) {
-                    if (currentKey) preset[currentKey] = currentValue.join('\n').trim();
-                    currentKey = 'name';
-                    currentValue = [line.replace(/^設定名[：:]\s*/, '')];
-                } else if (line.startsWith('場所・環境：') || line.startsWith('場所・環境:')) {
-                    if (currentKey) preset[currentKey] = currentValue.join('\n').trim();
-                    currentKey = 'location';
-                    currentValue = [line.replace(/^場所・環境[：:]\s*/, '')];
-                } else if (line.startsWith('キャラクター・人物：') || line.startsWith('キャラクター・人物:')) {
-                    if (currentKey) preset[currentKey] = currentValue.join('\n').trim();
-                    currentKey = 'characters';
-                    currentValue = [line.replace(/^キャラクター・人物[：:]\s*/, '')];
-                } else if (line.startsWith('時間帯・照明：') || line.startsWith('時間帯・照明:')) {
-                    if (currentKey) preset[currentKey] = currentValue.join('\n').trim();
-                    currentKey = 'lighting';
-                    currentValue = [line.replace(/^時間帯・照明[：:]\s*/, '')];
-                } else if (line.startsWith('雰囲気・スタイル：') || line.startsWith('雰囲気・スタイル:')) {
-                    if (currentKey) preset[currentKey] = currentValue.join('\n').trim();
-                    currentKey = 'style';
-                    currentValue = [line.replace(/^雰囲気・スタイル[：:]\s*/, '')];
-                } else if (line.startsWith('追加の詳細設定：') || line.startsWith('追加の詳細設定:')) {
-                    if (currentKey) preset[currentKey] = currentValue.join('\n').trim();
-                    currentKey = 'additional';
-                    currentValue = [line.replace(/^追加の詳細設定[：:]\s*/, '')];
-                } else if (currentKey) {
-                    // Continue previous value
-                    currentValue.push(line);
-                }
-            }
-
-            // Save last key
-            if (currentKey) {
-                preset[currentKey] = currentValue.join('\n').trim();
-            }
-
-            return preset;
         }
 
         function buildPresetPrompt(userPrompt) {
@@ -925,56 +835,108 @@
             return `${basePrompt}. Scene: ${userPrompt}`;
         }
 
-        showPresetBtn.addEventListener('click', () => {
-            loadPresetToForm();
-            presetModal.style.display = 'block';
-        });
+        // Parse CSV line with proper quote handling
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
 
-        closePresetBtn.addEventListener('click', () => {
-            presetModal.style.display = 'none';
-        });
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                const nextChar = line[i + 1];
 
-        savePresetBtn.addEventListener('click', () => {
-            const bulkText = presetBulkInput.value.trim();
-
-            if (!bulkText) {
-                alert('設定内容を入力してください');
-                return;
+                if (char === '"') {
+                    if (inQuotes && nextChar === '"') {
+                        // Escaped quote
+                        current += '"';
+                        i++; // Skip next quote
+                    } else {
+                        // Toggle quote state
+                        inQuotes = !inQuotes;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    // Field separator
+                    result.push(current);
+                    current = '';
+                } else {
+                    current += char;
+                }
             }
 
-            // Parse bulk text
-            currentPreset = parsePresetFromBulkText(bulkText);
+            result.push(current);
+            return result;
+        }
 
-            if (!currentPreset.name) {
-                currentPreset.name = '無題';
+        // Load CSV presets
+        async function loadPresets() {
+            try {
+                // Get all CSV files in the same directory
+                const csvFiles = ['iftech.csv']; // Add more CSV files here as needed
+
+                availablePresets = [];
+
+                for (const csvFile of csvFiles) {
+                    try {
+                        const response = await fetch(csvFile);
+                        if (!response.ok) continue;
+
+                        const text = await response.text();
+                        const lines = text.trim().split('\n');
+
+                        if (lines.length < 2) continue; // Need at least header + 1 row
+
+                        // Parse header
+                        const headers = parseCSVLine(lines[0]);
+
+                        // Parse data rows
+                        for (let i = 1; i < lines.length; i++) {
+                            const values = parseCSVLine(lines[i]);
+                            const preset = {};
+
+                            headers.forEach((header, index) => {
+                                preset[header.trim()] = values[index] ? values[index].trim() : '';
+                            });
+
+                            if (preset.name) {
+                                availablePresets.push(preset);
+                            }
+                        }
+                    } catch (error) {
+                        console.error(`Error loading ${csvFile}:`, error);
+                    }
+                }
+
+                // Populate dropdown
+                presetSelector.innerHTML = '<option value="">選択しない</option>';
+                availablePresets.forEach((preset, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = preset.name;
+                    presetSelector.appendChild(option);
+                });
+
+                console.log(`Loaded ${availablePresets.length} preset(s)`);
+            } catch (error) {
+                console.error('Error loading presets:', error);
             }
+        }
 
-            // Save to localStorage
-            localStorage.setItem('nanobanana_preset', JSON.stringify(currentPreset));
+        // Preset selector change handler
+        presetSelector.addEventListener('change', () => {
+            const selectedIndex = presetSelector.value;
+
+            if (selectedIndex === '') {
+                // "選択しない" was selected
+                currentPreset = null;
+            } else {
+                currentPreset = availablePresets[parseInt(selectedIndex)];
+            }
 
             updatePresetStatus();
-            presetModal.style.display = 'none';
-            alert('設定を保存しました！');
         });
 
-        clearPresetBtn.addEventListener('click', () => {
-            if (confirm('一貫性設定をクリアしますか？')) {
-                currentPreset = null;
-                localStorage.removeItem('nanobanana_preset');
-                updatePresetStatus();
-            }
-        });
-
-        // Load preset from localStorage on page load
-        try {
-            const savedPreset = localStorage.getItem('nanobanana_preset');
-            if (savedPreset) {
-                currentPreset = JSON.parse(savedPreset);
-                updatePresetStatus();
-            }
-        } catch (e) {
-            console.error('Failed to load preset:', e);
-        }
+        // Load presets on page load
+        loadPresets();
 
         // Initialize preset status
         updatePresetStatus();
