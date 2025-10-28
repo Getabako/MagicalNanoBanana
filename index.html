@@ -793,7 +793,8 @@
         const presetSelector = document.getElementById('presetSelector');
         const presetStatus = document.getElementById('presetStatus');
         let availablePresets = [];
-n        // Character Elements
+
+        // Character Elements
         const characterList = document.getElementById('characterList');
         const characterStatus = document.getElementById('characterStatus');
 
@@ -1158,7 +1159,16 @@ n        // Character Elements
 
         // Authentication submit
         authSubmit.addEventListener('click', async () => {
-            const password = authPassword.value;
+            const password = authPassword.value.trim();
+
+            // 空のパスワードチェック
+            if (!password) {
+                authError.textContent = '⚠️ パスワードを入力してください';
+                authError.style.display = 'block';
+                authError.style.color = '#FFA500';
+                return;
+            }
+
             if (password === AUTH_PASSWORD) {
                 isAuthenticated = true;
                 sessionStorage.setItem('nanobanana_auth', 'true');
@@ -1168,9 +1178,10 @@ n        // Character Elements
                 // メール通知を送信
                 sendLoginNotification();
             } else {
-                authError.textContent = '❌ パスワードが間違っています';
+                authError.textContent = '❌ パスワードが間違っています。もう一度確認してください。';
                 authError.style.display = 'block';
-                authPassword.value = '';
+                authError.style.color = '#DC3545';
+                authPassword.select(); // パスワードを選択状態にして再入力しやすく
             }
         });
 
