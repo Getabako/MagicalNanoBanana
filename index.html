@@ -633,7 +633,6 @@
                 設定なし
             </div>
         </div>
-<!-- Character Settings Section -->        <div class="input-section">            <label>キャラクター設定（選択したキャラの特徴を適用）：</label>            <div id="characterList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-bottom: 15px; padding: 15px; background: white; border: 2px solid #FFD93D; border-radius: 8px; max-height: 200px; overflow-y: auto;">                <!-- Character checkboxes will be populated here -->            </div>            <div id="characterStatus" style="padding: 10px; background: #FFF3CD; border: 2px solid #FFD93D; border-radius: 8px; font-size: 14px; color: #8B4513;">                キャラクター未選択            </div>        </div>
 
         <div class="aspect-ratio-section">
             <label>画像の縦横比：</label>
@@ -688,6 +687,19 @@
                     <input type="file" id="i2iFileInput" multiple accept="image/*" style="display:none;">
                 </div>
                 <div id="i2iUploadedImages" class="uploaded-images" style="display:none;"></div>
+            </div>
+
+            <!-- Character Settings Section -->
+            <div class="input-section">
+                <label>キャラクター設定（選択したキャラの特徴を適用）：</label>
+
+                <div id="characterList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-bottom: 15px; padding: 15px; background: white; border: 2px solid #FFD93D; border-radius: 8px; max-height: 200px; overflow-y: auto;">
+                    <!-- Character checkboxes will be populated here -->
+                </div>
+
+                <div id="characterStatus" style="padding: 10px; background: #FFF3CD; border: 2px solid #FFD93D; border-radius: 8px; font-size: 14px; color: #8B4513;">
+                    キャラクター未選択
+                </div>
             </div>
 
             <div class="input-section">
